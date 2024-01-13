@@ -1,9 +1,9 @@
 /*==========================================================================
 
-    lcd8574.c
+    lcd.c
 
     Implementation of the LCD "class" that is specified in
-    lcd8574.h. This file contains "methods" for initializing the LCD
+    lcd.h. This file contains "methods" for initializing the LCD
     module and writing text to it.
 
     Datasheet for the HD44780:

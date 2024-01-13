@@ -1,6 +1,6 @@
 /*============================================================================
 
-  lcd8574.h
+  lcd.h
 
   Functions to control an HD44780 LCD module via an PCF8574 I2C-to-parallel
   controller. The LCD controller is operated in 4-bit mode, so all the
@@ -8,7 +8,7 @@
   eight digitial outputs.
 
   There are many ways to connect the PCF8574 to the HD8840. Please see
-  the definitions at the top of lcd8574.c, to see typical connections
+  the definitions at the top of lcd.c, to see typical connections
   (or edit this file if your connections are different).
 
   This "class" provides the most basic functions available for the
