@@ -107,7 +107,7 @@
 
 struct _LCD8574 {
     int i2c_addr;
-    int fd; // For the /dev/i2c-1 device
+    int fd; // For the /dev/i2c-x device
     int rows;
     int cols;
     _Bool ready;
@@ -132,7 +132,7 @@ LCD *lcd8574_create(int i2c_addr, int rows, int cols) {
 ============================================================================*/
 void lcd8574_destroy(LCD *self) {
     if (self) {
-        lcd8574_uninit(self);
+        lcd8574_terminate(self);
         free(self);
     }
 }
@@ -309,11 +309,11 @@ void lcd8574_set_mode(LCD *self, unsigned char mode) {
   Initialize the display module
 
 ============================================================================*/
-_Bool lcd8574_init(LCD *self, char **error) {
+_Bool lcd8574_init(char *dev, LCD *self, char **error) {
     assert(self != NULL);
     int ret = 0;
     // See if we can open the I2C device
-    self->fd = open(I2C_DEV, O_WRONLY);
+    self->fd = open(dev, O_WRONLY);
     if (self->fd >= 0) {
         // Set the I2C slave address that was supplied when this
         //   object was created
@@ -383,9 +383,9 @@ _Bool lcd8574_init(LCD *self, char **error) {
 }
 
 /*============================================================================
-  lcd8574_uninit
+  lcd8574_terminate
 ============================================================================*/
-void lcd8574_uninit(LCD *self) {
+void lcd8574_terminate(LCD *self) {
     assert(self != NULL);
     if (self->fd >= 0)
         close(self->fd);

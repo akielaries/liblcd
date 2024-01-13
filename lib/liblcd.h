@@ -47,20 +47,21 @@ typedef struct _LCD8574 LCD;
     ends or bottom of the LCD.  */
 LCD *lcd8574_create(int i2c_addr, int rows, int cols);
 
-/** Clean up this object. This method implicitly calls _uninit(). */
+/** Clean up this object. This method implicitly calls _terminate(). */
 void lcd8574_destroy(LCD *self);
 
 /** Initialize this object. This opens a file handle for the
     I2C device and keeps it open until _unint() is called. This method
     can fail. If it does, and *error is not NULL, then it is written with
     and error message that the caller should free. If this method
-    succeeds, _uninit() should be called in due course to clean up. */
-_Bool lcd8574_init(LCD *self, char **error);
+    succeeds, _terminate() should be called in due course to clean up. */
+_Bool lcd8574_init(char *dev, LCD *self, char **error);
+
 
 /** Clean up. In principle, this operation can fail, as it involves device
     operations. But what can we do if this happens? Probably nothing, so no
     errors are reported. */
-void lcd8574_uninit(LCD *self);
+void lcd8574_terminate(LCD *self);
 
 /** Write a character at the specified position. Note that the LCD device
     has, by default, a character set that is a kind of modified ASCII.

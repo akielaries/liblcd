@@ -29,7 +29,7 @@ GPIO *gpio_create(int pin) {
 }
 
 /*============================================================================
-  gpio_write_to_file
+  gpio_err_msg
 ============================================================================*/
 void gpio_err_msg(const char *filename, char **error) {
     // get size of error message
@@ -50,6 +50,9 @@ void gpio_err_msg(const char *filename, char **error) {
              strerror(errno));
 }
 
+/*============================================================================
+  gpio_write_to_file
+============================================================================*/
 static _Bool
 gpio_write_to_file(const char *filename, const char *text, char **error) {
     assert(filename != NULL);
@@ -75,7 +78,7 @@ gpio_write_to_file(const char *filename, const char *text, char **error) {
 ============================================================================*/
 void gpio_destroy(GPIO *self) {
     if (self) {
-        gpio_uninit(self);
+        gpio_terminate(self);
         free(self);
     }
 }
@@ -110,9 +113,9 @@ _Bool gpio_init(GPIO *self, char **error) {
 }
 
 /*============================================================================
-  gpio_uninit
+  gpio_terminate
 ============================================================================*/
-void gpio_uninit(GPIO *self) {
+void gpio_terminate(GPIO *self) {
     assert(self != NULL);
     if (self->value_fd >= 0)
         close(self->value_fd);

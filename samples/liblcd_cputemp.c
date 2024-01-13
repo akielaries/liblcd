@@ -8,9 +8,9 @@
     Copyright (c)2020 Kevin Boone, GPL v3.0
 
 ============================================================================*/
-#include "../lib/liblcd.h"
+//#include "../lib/liblcd.h"
 #include <errno.h>
-//#include <liblcd/liblcd.h>
+#include <liblcd/liblcd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -38,7 +38,7 @@ int main(int argc, char **argv) {
     char *error = NULL;
 
     char *dev = "/dev/i2c-1";
-    if (lcd8574_init(dev, hc, &error)) {
+    if (lcd8574_init(hc, &error)) {
         // Note that because the text we're writing is a fixed length,
         //  there's no need to clear the display before refreshing it --
         //  we just write the old text on top of the new. This causes
@@ -62,7 +62,7 @@ int main(int argc, char **argv) {
             usleep(1000000);
         }
 
-        lcd8574_terminate(hc);
+        lcd8574_uninit(hc);
         lcd8574_destroy(hc);
     } else {
         fprintf(stderr, "%s: %s\n", argv[0], error);
