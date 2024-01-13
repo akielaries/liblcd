@@ -31,27 +31,6 @@ GPIO *gpio_create(int pin) {
 /*============================================================================
   gpio_write_to_file
 ============================================================================*/
-/*static _Bool
-gpio_write_to_file(const char *filename, const char *text, char **error) {
-    assert(filename != NULL);
-    assert(text != NULL);
-    _Bool ret = 0;
-    FILE *f = fopen(filename, "w");
-    if (f) {
-        fprintf(f, text);
-        fclose(f);
-        ret = 1;
-    } else {
-        if (error)
-            asprintf(error,
-                     "Can't open %s for writing: %s",
-                     filename,
-                     strerror(errno));
-        ret = 0;
-    }
-    return ret;
-}*/
-
 void gpio_err_msg(const char *filename, char **error) {
     // get size of error message
     size_t error_size = snprintf(NULL,
