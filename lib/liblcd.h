@@ -28,60 +28,58 @@
   GNU Public Licence, v3.0
 
   ==========================================================================*/
-#pragma once
-
-#include "defs.h"
+#ifndef __LIBLCD_H__
+#define __LIBLCD_H__
 
 // Flags for use with lcd8574_set_mode().
 #define LCD_MODE_CURSOR_BLINK 0x01
 #define LCD_MODE_CURSOR_ON 0x02
 #define LCD_MODE_DISPLAY_ON 0x04
 
-struct LCD8574;
-typedef struct _LCD8574 LCD8574;
+struct LCD;
+typedef struct _LCD8574 LCD;
 
-BEGIN_DECLS
 
-/** Initialize the LCD8574 object with the numbers of the three GPIO
+/** Initialize the LCD object with the numbers of the three GPIO
     pins that will be used. Note that this method only stores values,
     and will always succeed. The caller should specify the size of
     the LCD, because this cannot be worked out by interrogating
     the device. The sizes are only used to prevent writing off the
     ends or bottom of the LCD.  */
-LCD8574 *lcd8574_create(int i2c_addr, int rows, int cols);
+LCD *lcd8574_create(int i2c_addr, int rows, int cols);
 
 /** Clean up this object. This method implicitly calls _uninit(). */
-void lcd8574_destroy(LCD8574 *self);
+void lcd8574_destroy(LCD *self);
 
 /** Initialize this object. This opens a file handle for the
     I2C device and keeps it open until _unint() is called. This method
     can fail. If it does, and *error is not NULL, then it is written with
     and error message that the caller should free. If this method
     succeeds, _uninit() should be called in due course to clean up. */
-_Bool lcd8574_init(LCD8574 *self, char **error);
+_Bool lcd8574_init(LCD *self, char **error);
 
 /** Clean up. In principle, this operation can fail, as it involves device
     operations. But what can we do if this happens? Probably nothing, so no
     errors are reported. */
-void lcd8574_uninit(LCD8574 *self);
+void lcd8574_uninit(LCD *self);
 
 /** Write a character at the specified position. Note that the LCD device
     has, by default, a character set that is a kind of modified ASCII.
     The method will do nothing if the specific row and column are out of
     range. */
-void lcd8574_write_char_at(LCD8574 *self, int row, int col, unsigned char c);
+void lcd8574_write_char_at(LCD *self, int row, int col, unsigned char c);
 
 /** Write a string of ASCII(-ish) characters, starting at the specified
     position. If wrap is set, output will continue on the next line
     if it reaches the end of the first. However, there is no scrolling if
     if reach the end of the last line. */
-void lcd8574_write_string_at(LCD8574 *self,
+void lcd8574_write_string_at(LCD *self,
                              int row,
                              int col,
                              const unsigned char *s,
                              _Bool wrap);
 
-void lcd8574_clear(LCD8574 *self);
+void lcd8574_clear(LCD *self);
 
 /** Sets the display mode control register. This allows the display to
     be turned on and off, and the cursor mode to be set. These functions
@@ -89,12 +87,12 @@ void lcd8574_clear(LCD8574 *self);
     LCD device in the same command byte. Note that the modes are not
     cummulative -- you have to set them all in one operation, which isn't
     hugely convenient. */
-void lcd8574_set_mode(LCD8574 *self, unsigned char mode);
+void lcd8574_set_mode(LCD *self, unsigned char mode);
 
 /** Set the cursor position. The cursor must have been set visible for
     this method to show any effect. Note that the HD44780 LCD module does
     not have a specific method to set the cursor position -- it just follows
     the text. The method I use is a hack. */
-void lcd8574_set_cursor(LCD8574 *self, int row, int col);
+void lcd8574_set_cursor(LCD *self, int row, int col);
 
-END_DECLS
+#endif

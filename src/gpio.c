@@ -8,8 +8,7 @@
 
 ============================================================================*/
 #define _GNU_SOURCE
-#include "gpiopin.h"
-#include "defs.h"
+#include "../lib/gpio.h"
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>

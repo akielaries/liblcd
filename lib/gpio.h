@@ -8,14 +8,11 @@
   GNU Public Licence, v3.0
 
   ==========================================================================*/
-#pragma once
-
-#include "defs.h"
+#ifndef __GPIO_H__
+#define __GPIO_H__
 
 struct GPIOPin;
 typedef struct _GPIOPin GPIOPin;
-
-BEGIN_DECLS
 
 /** Initialize the GPIOPin object with pin number.
     Note that this method only stores values,
@@ -40,4 +37,5 @@ void gpiopin_uninit(GPIOPin *self);
 /** Set this pin HIGH or LOW. */
 void gpiopin_set(GPIOPin *self, _Bool val);
 
-END_DECLS
+
+#endif

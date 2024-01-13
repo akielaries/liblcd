@@ -2,14 +2,13 @@
 
     main.c
 
-    A test driver for the LCD8574 "class". It just displays the current
+    A test driver for the LCD "class". It just displays the current
     time and date on the LCD.
 
     Copyright (c)2020 Kevin Boone, GPL v3.0
 
 ============================================================================*/
-#include "defs.h"
-#include "lcd8574.h"
+#include "../lib/liblcd.h"
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -33,8 +32,8 @@ int main(int argc, char **argv) {
     setenv("TZ", "MST7MDT", 1);
     tzset();
 
-    // Set up the LCD8574 instance with the three GPIO pin numbers.
-    LCD8574 *hc = lcd8574_create(I2C_ADDR, ROWS, COLS);
+    // Set up the LCD instance with the three GPIO pin numbers.
+    LCD *hc = lcd8574_create(I2C_ADDR, ROWS, COLS);
     char *error = NULL;
     if (lcd8574_init(hc, &error)) {
         // Note that because the text we're writing is a fixed length,
