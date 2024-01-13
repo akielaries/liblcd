@@ -69,7 +69,7 @@ void lcd8574_uninit(LCD8574 *self);
     has, by default, a character set that is a kind of modified ASCII.
     The method will do nothing if the specific row and column are out of
     range. */
-void lcd8574_write_char_at(LCD8574 *self, int row, int col, BYTE c);
+void lcd8574_write_char_at(LCD8574 *self, int row, int col, unsigned char c);
 
 /** Write a string of ASCII(-ish) characters, starting at the specified
     position. If wrap is set, output will continue on the next line
@@ -78,7 +78,7 @@ void lcd8574_write_char_at(LCD8574 *self, int row, int col, BYTE c);
 void lcd8574_write_string_at(LCD8574 *self,
                              int row,
                              int col,
-                             const BYTE *s,
+                             const unsigned char *s,
                              _Bool wrap);
 
 void lcd8574_clear(LCD8574 *self);
@@ -89,7 +89,7 @@ void lcd8574_clear(LCD8574 *self);
     LCD device in the same command byte. Note that the modes are not
     cummulative -- you have to set them all in one operation, which isn't
     hugely convenient. */
-void lcd8574_set_mode(LCD8574 *self, BYTE mode);
+void lcd8574_set_mode(LCD8574 *self, unsigned char mode);
 
 /** Set the cursor position. The cursor must have been set visible for
     this method to show any effect. Note that the HD44780 LCD module does

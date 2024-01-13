@@ -42,19 +42,19 @@ static _Bool
 gpiopin_write_to_file(const char *filename, const char *text, char **error) {
     assert(filename != NULL);
     assert(text != NULL);
-    _Bool ret = FALSE;
+    _Bool ret = 0;
     FILE *f = fopen(filename, "w");
     if (f) {
         fprintf(f, text);
         fclose(f);
-        ret = TRUE;
+        ret = 1;
     } else {
         if (error)
             asprintf(error,
                      "Can't open %s for writing: %s",
                      filename,
                      strerror(errno));
-        ret = FALSE;
+        ret = 0;
     }
     return ret;
 }
@@ -84,14 +84,14 @@ _Bool gpiopin_init(GPIOPin *self, char **error) {
         snprintf(s, sizeof(s), "/sys/class/gpio/gpio%d/value", self->pin);
         self->value_fd = open(s, O_WRONLY);
         if (self->value_fd >= 0) {
-            ret = TRUE;
+            ret = 1;
         } else {
             if (error)
                 asprintf(error,
                          "Can't open %s for writing: %s",
                          s,
                          strerror(errno));
-            ret = FALSE;
+            ret = 0;
         }
     }
     return ret;

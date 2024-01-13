@@ -42,7 +42,7 @@ int main(int argc, char **argv) {
         //  we just write the old text on top of the new. This causes
         //  less flicker than a full refresh.
         lcd8574_clear(hc);
-        while (TRUE) {
+        while (1) {
             // Write the whole output. In a real appliation, we'd only write
             //  the character cells that had changed between updates, to
             //  save time and reduce flicker
@@ -50,13 +50,13 @@ int main(int argc, char **argv) {
             time_t t = time(NULL);
             struct tm *tm = localtime(&t);
             sprintf(s, "%02d:%02d:%02d", tm->tm_hour, tm->tm_min, tm->tm_sec);
-            lcd8574_write_string_at(hc, 0, 0, (BYTE *)s, FALSE);
+            lcd8574_write_string_at(hc, 0, 0, (unsigned char *)s, 0);
             sprintf(s,
                     "%04d/%02d/%02d",
                     tm->tm_year + 1900,
                     tm->tm_mon + 1,
                     tm->tm_mday);
-            lcd8574_write_string_at(hc, 1, 0, (BYTE *)s, FALSE);
+            lcd8574_write_string_at(hc, 1, 0, (unsigned char *)s, 0);
             usleep(1000000);
         }
 

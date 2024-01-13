@@ -123,7 +123,7 @@ LCD8574 *lcd8574_create(int i2c_addr, int rows, int cols) {
     memset(self, 0, sizeof(LCD8574));
     self->i2c_addr = i2c_addr;
     self->fd = -1;
-    self->ready = FALSE;
+    self->ready = 0;
     self->rows = rows;
     self->cols = cols;
     return self;
@@ -146,8 +146,8 @@ void lcd8574_destroy(LCD8574 *self) {
   A helper function to set bits in a particular byte
 
 ============================================================================*/
-static BYTE lcd8574_set_bit_value(BYTE b, int bit, _Bool val) {
-    BYTE ret = b;
+static unsigned char lcd8574_set_bit_value(unsigned char b, int bit, _Bool val) {
+    unsigned char ret = b;
     if (val)
         ret |= (1 << bit);
     else
@@ -175,8 +175,8 @@ static BYTE lcd8574_set_bit_value(BYTE b, int bit, _Bool val) {
   change the set of 8 PCF8574 outputs in a single operation.
 
 ============================================================================*/
-static void lcd8574_send_4_bits(LCD8574 *self, _Bool rs, BYTE n) {
-    BYTE b = (n << 4) & 0xF0;
+static void lcd8574_send_4_bits(LCD8574 *self, _Bool rs, unsigned char n) {
+    unsigned char b = (n << 4) & 0xF0;
 
     if (PIN_LED > 0)
         b = lcd8574_set_bit_value(b, PIN_LED, 1);
@@ -207,7 +207,7 @@ static void lcd8574_send_4_bits(LCD8574 *self, _Bool rs, BYTE n) {
   low four bits.
 
 ============================================================================*/
-static void lcd8574_send_byte(LCD8574 *self, _Bool rs, BYTE n) {
+static void lcd8574_send_byte(LCD8574 *self, _Bool rs, unsigned char n) {
     lcd8574_send_4_bits(self, rs, (n >> 4) & 0x0F);
     lcd8574_send_4_bits(self, rs, n & 0x0F);
 }
@@ -222,7 +222,7 @@ static void lcd8574_send_byte(LCD8574 *self, _Bool rs, BYTE n) {
   is data, not a command.
 
 ============================================================================*/
-void lcd8574_write_char_at(LCD8574 *self, int row, int col, BYTE c) {
+void lcd8574_write_char_at(LCD8574 *self, int row, int col, unsigned char c) {
     if (row < self->rows && col < self->cols) {
         int addr = row * LCD_CHARS_PER_ROW + col;
         lcd8574_send_byte(self, 0, CMD_SET_DDRAM_ADDR | addr);
@@ -245,7 +245,7 @@ void lcd8574_write_char_at(LCD8574 *self, int row, int col, BYTE c) {
 void lcd8574_write_string_at(LCD8574 *self,
                              int row,
                              int col,
-                             const BYTE *s,
+                             const unsigned char *s,
                              _Bool wrap) {
     if (row < self->rows && col < self->cols) {
         int addr = row * LCD_CHARS_PER_ROW + col;
@@ -288,7 +288,7 @@ void lcd8574_clear(LCD8574 *self) {
 
 ============================================================================*/
 void lcd8574_set_cursor(LCD8574 *self, int row, int col) {
-    lcd8574_write_string_at(self, row, col, (BYTE *)"\0", TRUE);
+    lcd8574_write_string_at(self, row, col, (unsigned char *)"\0", 1);
 }
 
 /*============================================================================
@@ -299,7 +299,7 @@ void lcd8574_set_cursor(LCD8574 *self, int row, int col) {
   by the caller.
 
 ============================================================================*/
-void lcd8574_set_mode(LCD8574 *self, BYTE mode) {
+void lcd8574_set_mode(LCD8574 *self, unsigned char mode) {
     lcd8574_send_byte(self, 0, CMD_CTRL | mode);
 }
 
@@ -312,7 +312,7 @@ void lcd8574_set_mode(LCD8574 *self, BYTE mode) {
 ============================================================================*/
 _Bool lcd8574_init(LCD8574 *self, char **error) {
     assert(self != NULL);
-    int ret = FALSE;
+    int ret = 0;
     // See if we can open the I2C device
     self->fd = open(I2C_DEV, O_WRONLY);
     if (self->fd >= 0) {
@@ -322,7 +322,7 @@ _Bool lcd8574_init(LCD8574 *self, char **error) {
             // Set all output PCF8574 lines to zero, because we don't really
             // know
             //  how they will power up
-            BYTE c = 0;
+            unsigned char c = 0;
             write(self->fd, &c, 1);
             usleep(35000);
 
@@ -342,7 +342,7 @@ _Bool lcd8574_init(LCD8574 *self, char **error) {
             //  command sequence. This method of setting the mode is widely
             //  used, even though it isn't documented, and it seems to work OK.
 
-            BYTE func = CMD_FUNC | LCD_FUNC_DL; // Set 8-bit mode
+            unsigned char func = CMD_FUNC | LCD_FUNC_DL; // Set 8-bit mode
             lcd8574_send_4_bits(self, 0, func >> 4);
             usleep(35000);
             lcd8574_send_4_bits(self, 0, func >> 4);
@@ -369,8 +369,8 @@ _Bool lcd8574_init(LCD8574 *self, char **error) {
             // lcd8574_send_byte (self, 0, CMD_ENTRY | LCD_ENTRY_ID);
             // lcd8574_send_byte (self, 0, CMD_CDSHIFT | LCD_CDSHIFT_RL);
 
-            ret = TRUE;
-            self->ready = TRUE;
+            ret = 1;
+            self->ready = 1;
         } else {
             asprintf(error, "Can't intialize I2C device: %s", strerror(errno));
         }
@@ -387,5 +387,5 @@ void lcd8574_uninit(LCD8574 *self) {
     assert(self != NULL);
     if (self->fd >= 0)
         close(self->fd);
-    self->ready = FALSE;
+    self->ready = 0;
 }
