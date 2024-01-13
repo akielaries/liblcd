@@ -1,6 +1,7 @@
-# lcd8547
+# liblcd
+> :warning: Forked from [kevinboone/lcd8547](https://github.com/kevinboone/lcd8547).
 
-A complete C program, that relies on no external libraries, for 
-controlling a Hitachi HD44780 LCD module using a PCF8547 I2C-parallel converter.
+liblcd is a simple C library to interface with 16x02 LCDs using an I2C backpack.
+For now, the library is only tested on Raspberry Pi and Jetson series devices.
 
 For details, see http://kevinboone.me/pi-lcd.html  
