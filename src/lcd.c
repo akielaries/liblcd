@@ -15,9 +15,8 @@
     Copyright (c)2020 Kevin Boone, GPL v3.0
 
 ============================================================================*/
-#define _GNU_SOURCE
-#include "../lib/liblcd.h"
 #include "../lib/gpio.h"
+#include "../lib/liblcd.h"
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -372,10 +371,13 @@ _Bool lcd8574_init(LCD *self, char **error) {
             ret = 1;
             self->ready = 1;
         } else {
-            asprintf(error, "Can't intialize I2C device: %s", strerror(errno));
+            //asprintf(error, "Can't intialize I2C device: %s", strerror(errno));
+            gpio_err_msg("Can't set I2C device address", error);
         }
     } else {
-        asprintf(error, "Can't open I2C device: %s", strerror(errno));
+        //asprintf(error, "Can't open I2C device: %s", strerror(errno));
+        gpio_err_msg("Can't open I2C device", error);
+
     }
     return ret;
 }

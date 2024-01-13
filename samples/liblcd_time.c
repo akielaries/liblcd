@@ -9,8 +9,8 @@
 
 ============================================================================*/
 //#include "../lib/liblcd.h"
-#include <liblcd/liblcd.h>
 #include <errno.h>
+#include <liblcd/liblcd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -36,6 +36,8 @@ int main(int argc, char **argv) {
     // Set up the LCD instance with the three GPIO pin numbers.
     LCD *hc = lcd8574_create(I2C_ADDR, ROWS, COLS);
     char *error = NULL;
+
+    char *dev = "/dev/i2c-1";
     if (lcd8574_init(hc, &error)) {
         // Note that because the text we're writing is a fixed length,
         //  there's no need to clear the display before refreshing it --

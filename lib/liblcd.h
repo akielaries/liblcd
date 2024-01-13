@@ -39,7 +39,6 @@
 struct LCD;
 typedef struct _LCD8574 LCD;
 
-
 /** Initialize the LCD object with the numbers of the three GPIO
     pins that will be used. Note that this method only stores values,
     and will always succeed. The caller should specify the size of
