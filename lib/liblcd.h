@@ -36,8 +36,13 @@
 #define LCD_MODE_CURSOR_ON 0x02
 #define LCD_MODE_DISPLAY_ON 0x04
 
-struct LCD;
-typedef struct _LCD8574 LCD;
+typedef struct LCD {
+    int i2c_addr;
+    int fd; // For the /dev/i2c-x device
+    int rows;
+    int cols;
+    _Bool ready;
+} LCD;
 
 /** Initialize the LCD object with the numbers of the three GPIO
     pins that will be used. Note that this method only stores values,

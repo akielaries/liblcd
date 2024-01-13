@@ -103,16 +103,6 @@
 // The value of 64 comes from the datasheet
 #define LCD_CHARS_PER_ROW 64
 
-#define I2C_DEV "/dev/i2c-1"
-
-struct _LCD8574 {
-    int i2c_addr;
-    int fd; // For the /dev/i2c-x device
-    int rows;
-    int cols;
-    _Bool ready;
-};
-
 /*============================================================================
   lcd_create
 ============================================================================*/
@@ -319,8 +309,7 @@ _Bool lcd_init(char *dev, LCD *self, char **error) {
         //   object was created
         if (ioctl(self->fd, I2C_SLAVE, self->i2c_addr) >= 0) {
             // Set all output PCF8574 lines to zero, because we don't really
-            // know
-            //  how they will power up
+            // know how they will power up
             unsigned char c = 0;
             write(self->fd, &c, 1);
             usleep(35000);
@@ -341,14 +330,15 @@ _Bool lcd_init(char *dev, LCD *self, char **error) {
             //  command sequence. This method of setting the mode is widely
             //  used, even though it isn't documented, and it seems to work OK.
 
-            unsigned char func = CMD_FUNC | LCD_FUNC_DL; // Set 8-bit mode
-            lcd_send_4_bits(self, 0, func >> 4);
-            usleep(35000);
-            lcd_send_4_bits(self, 0, func >> 4);
-            usleep(35000);
-            lcd_send_4_bits(self, 0, func >> 4);
-            usleep(35000);
-            func = CMD_FUNC | 0; // Set 4-bit mode
+            // set 8-bit mode by sending 4-bit cmds 3 times in a row
+            unsigned char func = CMD_FUNC | LCD_FUNC_DL;
+            for (int i = 0; i < 3; ++i) {
+                lcd_send_4_bits(self, 0, func >> 4);
+                usleep(35000);
+            }
+
+            // set 4-bit mode
+            func = CMD_FUNC | 0;
             lcd_send_4_bits(self, 0, func >> 4);
             usleep(35000);
 
@@ -371,11 +361,9 @@ _Bool lcd_init(char *dev, LCD *self, char **error) {
             ret = 1;
             self->ready = 1;
         } else {
-            //asprintf(error, "Can't intialize I2C device: %s", strerror(errno));
             gpio_err_msg("Can't set I2C device address", error);
         }
     } else {
-        //asprintf(error, "Can't open I2C device: %s", strerror(errno));
         gpio_err_msg("Can't open I2C device", error);
 
     }
