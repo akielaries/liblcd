@@ -1,6 +1,6 @@
 /*==========================================================================
 
-    gpiopin.c
+    gpio.c
 
     A "class" for setting values of specific GPIO pins.
 
@@ -26,9 +26,9 @@ struct _GPIOPin {
 /*============================================================================
   gpiopin_create
 ============================================================================*/
-GPIOPin *gpiopin_create(int pin) {
-    GPIOPin *self = malloc(sizeof(GPIOPin));
-    memset(self, 0, sizeof(GPIOPin));
+GPIO *gpiopin_create(int pin) {
+    GPIO *self = malloc(sizeof(GPIO));
+    memset(self, 0, sizeof(GPIO));
     self->pin = pin;
     self->value_fd = -1;
     return self;
@@ -61,7 +61,7 @@ gpiopin_write_to_file(const char *filename, const char *text, char **error) {
 /*============================================================================
   gpiopin_destroy
 ============================================================================*/
-void gpiopin_destroy(GPIOPin *self) {
+void gpiopin_destroy(GPIO *self) {
     if (self) {
         gpiopin_uninit(self);
         free(self);
@@ -71,7 +71,7 @@ void gpiopin_destroy(GPIOPin *self) {
 /*============================================================================
   gpiopin_init
 ============================================================================*/
-_Bool gpiopin_init(GPIOPin *self, char **error) {
+_Bool gpiopin_init(GPIO *self, char **error) {
     assert(self != NULL);
     char s[50];
     snprintf(s, sizeof(s), "%d", self->pin);
@@ -99,7 +99,7 @@ _Bool gpiopin_init(GPIOPin *self, char **error) {
 /*============================================================================
   gpiopin_uninit
 ============================================================================*/
-void gpiopin_uninit(GPIOPin *self) {
+void gpiopin_uninit(GPIO *self) {
     assert(self != NULL);
     if (self->value_fd >= 0)
         close(self->value_fd);
@@ -112,7 +112,7 @@ void gpiopin_uninit(GPIOPin *self) {
 /*============================================================================
   gpiopin_set
 ============================================================================*/
-void gpiopin_set(GPIOPin *self, _Bool val) {
+void gpiopin_set(GPIO *self, _Bool val) {
     assert(self != NULL);
     assert(self->value_fd >= 0);
     char c = val ? '1' : '0';
