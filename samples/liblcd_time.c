@@ -8,7 +8,8 @@
     Copyright (c)2020 Kevin Boone, GPL v3.0
 
 ============================================================================*/
-#include "../lib/liblcd.h"
+//#include "../lib/liblcd.h"
+#include <liblcd/liblcd.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
