@@ -114,9 +114,9 @@ struct _LCD8574 {
 };
 
 /*============================================================================
-  lcd8574_create
+  lcd_create
 ============================================================================*/
-LCD *lcd8574_create(int i2c_addr, int rows, int cols) {
+LCD *lcd_create(int i2c_addr, int rows, int cols) {
     LCD *self = malloc(sizeof(LCD));
     memset(self, 0, sizeof(LCD));
     self->i2c_addr = i2c_addr;
@@ -128,24 +128,24 @@ LCD *lcd8574_create(int i2c_addr, int rows, int cols) {
 }
 
 /*============================================================================
-  lcd8574_destroy
+  lcd_destroy
 ============================================================================*/
-void lcd8574_destroy(LCD *self) {
+void lcd_destroy(LCD *self) {
     if (self) {
-        lcd8574_terminate(self);
+        lcd_terminate(self);
         free(self);
     }
 }
 
 /*============================================================================
 
-  lcd8574_set_bit_value
+  lcd_set_bit_value
 
   A helper function to set bits in a particular byte
 
 ============================================================================*/
 static unsigned char
-lcd8574_set_bit_value(unsigned char b, int bit, _Bool val) {
+lcd_set_bit_value(unsigned char b, int bit, _Bool val) {
     unsigned char ret = b;
     if (val)
         ret |= (1 << bit);
@@ -156,7 +156,7 @@ lcd8574_set_bit_value(unsigned char b, int bit, _Bool val) {
 
 /*============================================================================
 
-  lcd8574_send_4_bits
+  lcd_send_4_bits
 
   Here's the sequence:
 
@@ -174,46 +174,46 @@ lcd8574_set_bit_value(unsigned char b, int bit, _Bool val) {
   change the set of 8 PCF8574 outputs in a single operation.
 
 ============================================================================*/
-static void lcd8574_send_4_bits(LCD *self, _Bool rs, unsigned char n) {
+static void lcd_send_4_bits(LCD *self, _Bool rs, unsigned char n) {
     unsigned char b = (n << 4) & 0xF0;
 
     if (PIN_LED > 0)
-        b = lcd8574_set_bit_value(b, PIN_LED, 1);
-    b = lcd8574_set_bit_value(b, PIN_RS, rs);
+        b = lcd_set_bit_value(b, PIN_LED, 1);
+    b = lcd_set_bit_value(b, PIN_RS, rs);
 
     // I think we don't need to set E (clock) low every time a command
     //  is sent. It starts off low, then gets pulse high and then low
     //  by this method. So long as we don't accidentally set it high
     //  anywhere else, we don't need to set it low repeatedly. This saves
     //  a couple of milliseconds on each command.
-    // b = lcd8574_set_bit_value (b, PIN_E, 0);
+    // b = lcd_set_bit_value (b, PIN_E, 0);
     // write (self->fd, &b, 1);
     // usleep (1000);
 
-    b = lcd8574_set_bit_value(b, PIN_E, 1);
+    b = lcd_set_bit_value(b, PIN_E, 1);
     write(self->fd, &b, 1);
     usleep(1000);
-    b = lcd8574_set_bit_value(b, PIN_E, 0);
+    b = lcd_set_bit_value(b, PIN_E, 0);
     write(self->fd, &b, 1);
     usleep(1000);
 }
 
 /*============================================================================
 
-  lcd8574_send_byte
+  lcd_send_byte
 
   To send a byte in 4-bit mode, we send the high four bits and then the
   low four bits.
 
 ============================================================================*/
-static void lcd8574_send_byte(LCD *self, _Bool rs, unsigned char n) {
-    lcd8574_send_4_bits(self, rs, (n >> 4) & 0x0F);
-    lcd8574_send_4_bits(self, rs, n & 0x0F);
+static void lcd_send_byte(LCD *self, _Bool rs, unsigned char n) {
+    lcd_send_4_bits(self, rs, (n >> 4) & 0x0F);
+    lcd_send_4_bits(self, rs, n & 0x0F);
 }
 
 /*============================================================================
 
-  lcd8574_write_char_at
+  lcd_write_char_at
 
   Use the SET_DDRAM_ADDR command to the LCD module to set the
   memory address where the char will be written. The send the
@@ -221,17 +221,17 @@ static void lcd8574_send_byte(LCD *self, _Bool rs, unsigned char n) {
   is data, not a command.
 
 ============================================================================*/
-void lcd8574_write_char_at(LCD *self, int row, int col, unsigned char c) {
+void lcd_write_char_at(LCD *self, int row, int col, unsigned char c) {
     if (row < self->rows && col < self->cols) {
         int addr = row * LCD_CHARS_PER_ROW + col;
-        lcd8574_send_byte(self, 0, CMD_SET_DDRAM_ADDR | addr);
-        lcd8574_send_byte(self, 1, c);
+        lcd_send_byte(self, 0, CMD_SET_DDRAM_ADDR | addr);
+        lcd_send_byte(self, 1, c);
     }
 }
 
 /*============================================================================
 
-  lcd8574_write_string_at
+  lcd_write_string_at
 
   Write a whole string, wrapping if necessary. The slightly convoluted
   logic is because the rows of characters are not contiguous in the LCD
@@ -241,22 +241,22 @@ void lcd8574_write_char_at(LCD *self, int row, int col, unsigned char c) {
   wraps to another line.
 
 ============================================================================*/
-void lcd8574_write_string_at(LCD *self,
+void lcd_write_string_at(LCD *self,
                              int row,
                              int col,
                              const unsigned char *s,
                              _Bool wrap) {
     if (row < self->rows && col < self->cols) {
         int addr = row * LCD_CHARS_PER_ROW + col;
-        lcd8574_send_byte(self, 0, CMD_SET_DDRAM_ADDR | addr);
+        lcd_send_byte(self, 0, CMD_SET_DDRAM_ADDR | addr);
         while (*s && row < self->rows && col < self->cols) {
-            lcd8574_send_byte(self, 1, *s);
+            lcd_send_byte(self, 1, *s);
             col++;
             if (col >= self->cols && wrap) {
                 row++;
                 col = 0;
                 addr = row * LCD_CHARS_PER_ROW + col;
-                lcd8574_send_byte(self, 0, CMD_SET_DDRAM_ADDR | addr);
+                lcd_send_byte(self, 0, CMD_SET_DDRAM_ADDR | addr);
             }
             s++;
         }
@@ -265,18 +265,18 @@ void lcd8574_write_string_at(LCD *self,
 
 /*============================================================================
 
-  lcd8574_clear
+  lcd_clear
 
   Just send the clear command.
 
 ============================================================================*/
-void lcd8574_clear(LCD *self) {
-    lcd8574_send_byte(self, 0, CMD_CLEAR);
+void lcd_clear(LCD *self) {
+    lcd_send_byte(self, 0, CMD_CLEAR);
 }
 
 /*============================================================================
 
-  lcd8574_set_cursor
+  lcd_set_cursor
 
   This is a bit hacky, because the HD44780 does have a "move cursor"
   function. The cursor goes right of the last text. So we print an invisible
@@ -286,30 +286,30 @@ void lcd8574_clear(LCD *self) {
   implementations support this.
 
 ============================================================================*/
-void lcd8574_set_cursor(LCD *self, int row, int col) {
-    lcd8574_write_string_at(self, row, col, (unsigned char *)"\0", 1);
+void lcd_set_cursor(LCD *self, int row, int col) {
+    lcd_write_string_at(self, row, col, (unsigned char *)"\0", 1);
 }
 
 /*============================================================================
 
-  lcd8574_set_mode
+  lcd_set_mode
 
   Just send a "control register" command, with the mode bits specified
   by the caller.
 
 ============================================================================*/
-void lcd8574_set_mode(LCD *self, unsigned char mode) {
-    lcd8574_send_byte(self, 0, CMD_CTRL | mode);
+void lcd_set_mode(LCD *self, unsigned char mode) {
+    lcd_send_byte(self, 0, CMD_CTRL | mode);
 }
 
 /*============================================================================
 
-  lcd8574_init
+  lcd_init
 
   Initialize the display module
 
 ============================================================================*/
-_Bool lcd8574_init(char *dev, LCD *self, char **error) {
+_Bool lcd_init(char *dev, LCD *self, char **error) {
     assert(self != NULL);
     int ret = 0;
     // See if we can open the I2C device
@@ -342,31 +342,31 @@ _Bool lcd8574_init(char *dev, LCD *self, char **error) {
             //  used, even though it isn't documented, and it seems to work OK.
 
             unsigned char func = CMD_FUNC | LCD_FUNC_DL; // Set 8-bit mode
-            lcd8574_send_4_bits(self, 0, func >> 4);
+            lcd_send_4_bits(self, 0, func >> 4);
             usleep(35000);
-            lcd8574_send_4_bits(self, 0, func >> 4);
+            lcd_send_4_bits(self, 0, func >> 4);
             usleep(35000);
-            lcd8574_send_4_bits(self, 0, func >> 4);
+            lcd_send_4_bits(self, 0, func >> 4);
             usleep(35000);
             func = CMD_FUNC | 0; // Set 4-bit mode
-            lcd8574_send_4_bits(self, 0, func >> 4);
+            lcd_send_4_bits(self, 0, func >> 4);
             usleep(35000);
 
             // Set more than one row (the LCD only has two line modes,
             //  "one" or "more that one")
             func = CMD_FUNC | LCD_FUNC_N;
             // NB -- send_byte sends two 4-bit commands in a row
-            lcd8574_send_byte(self, 0, func);
+            lcd_send_byte(self, 0, func);
 
             // Clear display
-            lcd8574_clear(self);
-            lcd8574_set_mode(self, LCD_MODE_DISPLAY_ON);
+            lcd_clear(self);
+            lcd_set_mode(self, LCD_MODE_DISPLAY_ON);
 
             // We might want to set the cursor and shift modes -- but, honestly,
             //   it's more likely that the user of this class will take care of
             //   these things.
-            // lcd8574_send_byte (self, 0, CMD_ENTRY | LCD_ENTRY_ID);
-            // lcd8574_send_byte (self, 0, CMD_CDSHIFT | LCD_CDSHIFT_RL);
+            // lcd_send_byte (self, 0, CMD_ENTRY | LCD_ENTRY_ID);
+            // lcd_send_byte (self, 0, CMD_CDSHIFT | LCD_CDSHIFT_RL);
 
             ret = 1;
             self->ready = 1;
@@ -383,9 +383,9 @@ _Bool lcd8574_init(char *dev, LCD *self, char **error) {
 }
 
 /*============================================================================
-  lcd8574_terminate
+  lcd_terminate
 ============================================================================*/
-void lcd8574_terminate(LCD *self) {
+void lcd_terminate(LCD *self) {
     assert(self != NULL);
     if (self->fd >= 0)
         close(self->fd);

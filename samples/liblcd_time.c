@@ -34,16 +34,16 @@ int main(int argc, char **argv) {
     tzset();
 
     // Set up the LCD instance with the three GPIO pin numbers.
-    LCD *hc = lcd8574_create(I2C_ADDR, ROWS, COLS);
+    LCD *hc = lcd_create(I2C_ADDR, ROWS, COLS);
     char *error = NULL;
 
     char *dev = "/dev/i2c-1";
-    if (lcd8574_init(dev, hc, &error)) {
+    if (lcd_init(dev, hc, &error)) {
         // Note that because the text we're writing is a fixed length,
         //  there's no need to clear the display before refreshing it --
         //  we just write the old text on top of the new. This causes
         //  less flicker than a full refresh.
-        lcd8574_clear(hc);
+        lcd_clear(hc);
         while (1) {
             // Write the whole output. In a real appliation, we'd only write
             //  the character cells that had changed between updates, to
@@ -52,18 +52,18 @@ int main(int argc, char **argv) {
             time_t t = time(NULL);
             struct tm *tm = localtime(&t);
             sprintf(s, "%02d:%02d:%02d", tm->tm_hour, tm->tm_min, tm->tm_sec);
-            lcd8574_write_string_at(hc, 0, 0, (unsigned char *)s, 0);
+            lcd_write_string_at(hc, 0, 0, (unsigned char *)s, 0);
             sprintf(s,
                     "%04d/%02d/%02d",
                     tm->tm_year + 1900,
                     tm->tm_mon + 1,
                     tm->tm_mday);
-            lcd8574_write_string_at(hc, 1, 0, (unsigned char *)s, 0);
+            lcd_write_string_at(hc, 1, 0, (unsigned char *)s, 0);
             usleep(1000000);
         }
 
-        lcd8574_terminate(hc);
-        lcd8574_destroy(hc);
+        lcd_terminate(hc);
+        lcd_destroy(hc);
     } else {
         fprintf(stderr, "%s: %s\n", argv[0], error);
         free(error);
