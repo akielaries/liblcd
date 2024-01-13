@@ -146,7 +146,8 @@ void lcd8574_destroy(LCD8574 *self) {
   A helper function to set bits in a particular byte
 
 ============================================================================*/
-static unsigned char lcd8574_set_bit_value(unsigned char b, int bit, _Bool val) {
+static unsigned char
+lcd8574_set_bit_value(unsigned char b, int bit, _Bool val) {
     unsigned char ret = b;
     if (val)
         ret |= (1 << bit);

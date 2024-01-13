@@ -17,7 +17,7 @@
 #endif
 
 #ifndef _Bool
-//typedef int _Bool;
+// typedef int _Bool;
 #endif
 
 #ifndef BYTE
