@@ -30,7 +30,7 @@ void gpiopin_destroy(GPIOPin *self);
     can fail. If it does, and *error is not NULL, then it is written with
     and error message that the caller should free. If this method
     succeeds, _uninit() should be called in due course to clean up. */
-BOOL gpiopin_init(GPIOPin *self, char **error);
+_Bool gpiopin_init(GPIOPin *self, char **error);
 
 /** Clean up. In principle, this operation can fail, as it involves sysfs
     operations. But what can we do if this happens? Probably nothing, so no
@@ -38,6 +38,6 @@ BOOL gpiopin_init(GPIOPin *self, char **error);
 void gpiopin_uninit(GPIOPin *self);
 
 /** Set this pin HIGH or LOW. */
-void gpiopin_set(GPIOPin *self, BOOL val);
+void gpiopin_set(GPIOPin *self, _Bool val);
 
 END_DECLS

@@ -16,8 +16,8 @@
 #define END_DECLS
 #endif
 
-#ifndef BOOL
-typedef int BOOL;
+#ifndef _Bool
+//typedef int _Bool;
 #endif
 
 #ifndef BYTE

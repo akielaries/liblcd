@@ -38,11 +38,11 @@ GPIOPin *gpiopin_create(int pin) {
 /*============================================================================
   gpiopin_write_to_file
 ============================================================================*/
-static BOOL
+static _Bool
 gpiopin_write_to_file(const char *filename, const char *text, char **error) {
     assert(filename != NULL);
     assert(text != NULL);
-    BOOL ret = FALSE;
+    _Bool ret = FALSE;
     FILE *f = fopen(filename, "w");
     if (f) {
         fprintf(f, text);
@@ -72,11 +72,11 @@ void gpiopin_destroy(GPIOPin *self) {
 /*============================================================================
   gpiopin_init
 ============================================================================*/
-BOOL gpiopin_init(GPIOPin *self, char **error) {
+_Bool gpiopin_init(GPIOPin *self, char **error) {
     assert(self != NULL);
     char s[50];
     snprintf(s, sizeof(s), "%d", self->pin);
-    BOOL ret = gpiopin_write_to_file("/sys/class/gpio/export", s, error);
+    _Bool ret = gpiopin_write_to_file("/sys/class/gpio/export", s, error);
     if (ret) {
         char s[50];
         snprintf(s, sizeof(s), "/sys/class/gpio/gpio%d/direction", self->pin);
@@ -113,7 +113,7 @@ void gpiopin_uninit(GPIOPin *self) {
 /*============================================================================
   gpiopin_set
 ============================================================================*/
-void gpiopin_set(GPIOPin *self, BOOL val) {
+void gpiopin_set(GPIOPin *self, _Bool val) {
     assert(self != NULL);
     assert(self->value_fd >= 0);
     char c = val ? '1' : '0';

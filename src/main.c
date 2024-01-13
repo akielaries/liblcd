@@ -30,6 +30,9 @@ int main(int argc, char **argv) {
     argc = argc;
     argv = argv; // Suppress warnings
 
+    setenv("TZ", "MST7MDT", 1);
+    tzset();
+
     // Set up the LCD8574 instance with the three GPIO pin numbers.
     LCD8574 *hc = lcd8574_create(I2C_ADDR, ROWS, COLS);
     char *error = NULL;

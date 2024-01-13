@@ -112,7 +112,7 @@ struct _LCD8574 {
     int fd; // For the /dev/i2c-1 device
     int rows;
     int cols;
-    BOOL ready;
+    _Bool ready;
 };
 
 /*============================================================================
@@ -146,7 +146,7 @@ void lcd8574_destroy(LCD8574 *self) {
   A helper function to set bits in a particular byte
 
 ============================================================================*/
-static BYTE lcd8574_set_bit_value(BYTE b, int bit, BOOL val) {
+static BYTE lcd8574_set_bit_value(BYTE b, int bit, _Bool val) {
     BYTE ret = b;
     if (val)
         ret |= (1 << bit);
@@ -175,7 +175,7 @@ static BYTE lcd8574_set_bit_value(BYTE b, int bit, BOOL val) {
   change the set of 8 PCF8574 outputs in a single operation.
 
 ============================================================================*/
-static void lcd8574_send_4_bits(LCD8574 *self, BOOL rs, BYTE n) {
+static void lcd8574_send_4_bits(LCD8574 *self, _Bool rs, BYTE n) {
     BYTE b = (n << 4) & 0xF0;
 
     if (PIN_LED > 0)
@@ -207,7 +207,7 @@ static void lcd8574_send_4_bits(LCD8574 *self, BOOL rs, BYTE n) {
   low four bits.
 
 ============================================================================*/
-static void lcd8574_send_byte(LCD8574 *self, BOOL rs, BYTE n) {
+static void lcd8574_send_byte(LCD8574 *self, _Bool rs, BYTE n) {
     lcd8574_send_4_bits(self, rs, (n >> 4) & 0x0F);
     lcd8574_send_4_bits(self, rs, n & 0x0F);
 }
@@ -246,7 +246,7 @@ void lcd8574_write_string_at(LCD8574 *self,
                              int row,
                              int col,
                              const BYTE *s,
-                             BOOL wrap) {
+                             _Bool wrap) {
     if (row < self->rows && col < self->cols) {
         int addr = row * LCD_CHARS_PER_ROW + col;
         lcd8574_send_byte(self, 0, CMD_SET_DDRAM_ADDR | addr);
@@ -310,7 +310,7 @@ void lcd8574_set_mode(LCD8574 *self, BYTE mode) {
   Initialize the display module
 
 ============================================================================*/
-BOOL lcd8574_init(LCD8574 *self, char **error) {
+_Bool lcd8574_init(LCD8574 *self, char **error) {
     assert(self != NULL);
     int ret = FALSE;
     // See if we can open the I2C device
